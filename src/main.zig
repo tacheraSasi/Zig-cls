@@ -12,7 +12,7 @@ pub fn main() !void {
     // - Windows 10+ (with VT100 support enabled by default)
     // - Windows Terminal
 
-    // Clearing screen and move cursor to top-left
+    // Clearing screen and moving cursor to top-left
     try stdout.print("\x1B[2J\x1B[H", .{});
     try stdout.flush();
 
