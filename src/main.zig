@@ -1,7 +1,12 @@
 const std = @import("std");
 
 pub fn main() !void {
-    const stdout = std.io.getStdOut().writer();
+    var stdout_buffer: [256]u8 = undefined;
+    var stdout_writer = std.fs.File.stdout().writer(&stdout_buffer);
+    const stdout = &stdout_writer.interface;
+
+    try stdout.print("greetings, program, welcome to the {s}, a {s}\n", .{ "grid", "digital frontier" });
+    try stdout.flush();
 
     // Use ANSI escape codes which work on:
     // - Linux/Unix terminals
@@ -10,7 +15,8 @@ pub fn main() !void {
     // - Windows Terminal
 
     // Clear screen and move cursor to top-left
-    try stdout.writeAll("\x1B[2J\x1B[H");
+    try stdout.print("\x1B[2J\x1B[H");
+    try stdout.flush();
 
     // Alternative method for older Windows systems:
     // if (@import("builtin").os.tag == .windows) {
