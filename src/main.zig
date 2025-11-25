@@ -8,17 +8,17 @@ pub fn main() !void {
     try stdout.print("clearing...\n", .{});
     try stdout.flush();
 
-    // Use ANSI escape codes which work on:
+    // ANSI escape codes which work on:
     // - Linux/Unix terminals
     // - macOS terminals
     // - Windows 10+ (with VT100 support enabled by default)
     // - Windows Terminal
 
-    // Clear screen and move cursor to top-left
+    // Clearing screen and move cursor to top-left
     try stdout.print("\x1B[2J\x1B[H", .{});
     try stdout.flush();
 
-    // Alternative method for older Windows systems:
+    // for older Windows systems:
     if (@import("builtin").os.tag == .windows) {
         const windows = std.os.windows;
         const kernel32 = windows.kernel32;
