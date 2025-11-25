@@ -1,27 +1,35 @@
 const std = @import("std");
-const cls = @import("cls");
 
 pub fn main() !void {
-    // Prints to stderr, ignoring potential errors.
-    std.debug.print("All your {s} are belong to us.\n", .{"codebase"});
-    try cls.bufferedPrint();
-}
+    const stdout = std.io.getStdOut().writer();
 
-test "simple test" {
-    const gpa = std.testing.allocator;
-    var list: std.ArrayList(i32) = .empty;
-    defer list.deinit(gpa); // Try commenting this out and see if zig detects the memory leak!
-    try list.append(gpa, 42);
-    try std.testing.expectEqual(@as(i32, 42), list.pop());
-}
+    // Use ANSI escape codes which work on:
+    // - Linux/Unix terminals
+    // - macOS terminals
+    // - Windows 10+ (with VT100 support enabled by default)
+    // - Windows Terminal
 
-test "fuzz example" {
-    const Context = struct {
-        fn testOne(context: @This(), input: []const u8) anyerror!void {
-            _ = context;
-            // Try passing `--fuzz` to `zig build test` and see if it manages to fail this test case!
-            try std.testing.expect(!std.mem.eql(u8, "canyoufindme", input));
-        }
-    };
-    try std.testing.fuzz(Context{}, Context.testOne, .{});
+    // Clear screen and move cursor to top-left
+    try stdout.writeAll("\x1B[2J\x1B[H");
+
+    // Alternative method for older Windows systems:
+    // if (@import("builtin").os.tag == .windows) {
+    //     const windows = std.os.windows;
+    //     const kernel32 = windows.kernel32;
+    //
+    //     const stdout_handle = try std.os.windows.GetStdHandle(std.os.windows.STD_OUTPUT_HANDLE);
+    //
+    //     var csbi: windows.CONSOLE_SCREEN_BUFFER_INFO = undefined;
+    //     if (kernel32.GetConsoleScreenBufferInfo(stdout_handle, &csbi) == 0) {
+    //         return error.GetConsoleInfoFailed;
+    //     }
+    //
+    //     const console_size = @as(u32, @intCast(csbi.dwSize.X)) * @as(u32, @intCast(csbi.dwSize.Y));
+    //     const coord = windows.COORD{ .X = 0, .Y = 0 };
+    //     var written: u32 = 0;
+    //
+    //     _ = kernel32.FillConsoleOutputCharacterA(stdout_handle, ' ', console_size, coord, &written);
+    //     _ = kernel32.FillConsoleOutputAttribute(stdout_handle, csbi.wAttributes, console_size, coord, &written);
+    //     _ = kernel32.SetConsoleCursorPosition(stdout_handle, coord);
+    // }
 }
